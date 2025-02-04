@@ -1,7 +1,7 @@
-package com.example.kakao_notice_board.controller;
+package com.example.kakao_notice_board.user.controller;
 
-import com.example.kakao_notice_board.dto.UserRegistrationRequest;
-import com.example.kakao_notice_board.service.UserService;
+import com.example.kakao_notice_board.user.dto.UserRegistrationRequest;
+import com.example.kakao_notice_board.user.service.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;

@@ -1,4 +1,4 @@
-package com.example.kakao_notice_board.domain;
+package com.example.kakao_notice_board.user.domain;
 
 import jakarta.persistence.*;
 import lombok.Data;

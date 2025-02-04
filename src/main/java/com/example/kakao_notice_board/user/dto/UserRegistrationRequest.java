@@ -1,4 +1,4 @@
-package com.example.kakao_notice_board.dto;
+package com.example.kakao_notice_board.user.dto;
 
 import lombok.Data;
 

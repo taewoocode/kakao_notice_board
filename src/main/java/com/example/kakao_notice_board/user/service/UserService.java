@@ -1,10 +1,9 @@
-package com.example.kakao_notice_board.service;
+package com.example.kakao_notice_board.user.service;
 
-import com.example.kakao_notice_board.domain.User;
-import com.example.kakao_notice_board.dto.UserRegistrationRequest;
-import com.example.kakao_notice_board.repository.UserRepository;
+import com.example.kakao_notice_board.user.domain.User;
+import com.example.kakao_notice_board.user.dto.UserRegistrationRequest;
+import com.example.kakao_notice_board.user.repository.UserRepository;
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 

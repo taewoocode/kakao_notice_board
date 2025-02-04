@@ -1,4 +1,4 @@
-package com.example.kakao_notice_board.config;
+package com.example.kakao_notice_board.user.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
