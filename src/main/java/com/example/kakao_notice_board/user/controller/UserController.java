@@ -23,10 +23,11 @@ public class UserController {
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping
+    @PostMapping("/login")
     public ResponseEntity<?> loginUser(
             @RequestBody UserRegistrationRequest request
     ) {
+
         boolean isAuthenticated = userService.authenticate(request);
         if (isAuthenticated) {
             return ResponseEntity.ok().build();
