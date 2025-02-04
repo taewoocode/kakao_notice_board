@@ -22,4 +22,12 @@ public class UserService {
         return userRepository.save(user);
     }
 
+    public boolean authenticate(UserRegistrationRequest request) {
+        User findUser = userRepository.findByUsername(request.getUsername());
+        if (findUser != null && findUser.getEmail().equals(request.getPassword())) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 }
