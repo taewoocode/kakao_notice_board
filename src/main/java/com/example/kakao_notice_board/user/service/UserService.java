@@ -12,19 +12,24 @@ import org.springframework.stereotype.Service;
 public class UserService {
 
     private final UserRepository userRepository;
-    private PasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder;
 
     public User registerUser(UserRegistrationRequest request) {
         User user = new User();
         user.setUsername(request.getUsername());
-        user.setPassword(request.getPassword());
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setEmail(request.getEmail());
         return userRepository.save(user);
     }
 
+    /**
+     *
+     * @param request
+     * @return
+     */
     public boolean authenticate(UserRegistrationRequest request) {
         User findUser = userRepository.findByUsername(request.getUsername());
-        if (findUser != null && findUser.getEmail().equals(request.getPassword())) {
+        if (findUser != null && passwordEncoder.matches(request.getPassword(), findUser.getPassword())) {
             return true;
         } else {
             return false;
