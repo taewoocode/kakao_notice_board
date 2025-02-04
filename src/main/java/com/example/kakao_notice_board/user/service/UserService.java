@@ -19,29 +19,38 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private static final Logger logger = LoggerFactory.getLogger(UserService.class);
 
+    @Transactional
     public User registerUser(UserRegistrationRequest request) {
-        User user = new User();
-        user.setUsername(request.getUsername());
-        user.setPassword(passwordEncoder.encode(request.getPassword()));
-        user.setEmail(request.getEmail());
-        User savedUser = userRepository.save(user);
-        logger.info("User registered: {}", savedUser);
-        return savedUser;
+        try {
+            User user = new User();
+            user.setUsername(request.getUsername());
+            user.setPassword(passwordEncoder.encode(request.getPassword()));
+            user.setEmail(request.getEmail());
+
+            User savedUser = userRepository.save(user);
+            logger.info("User registered: {}", savedUser);
+
+            return savedUser;
+        } catch (Exception e) {
+            logger.error("회원가입 중 오류 발생: {}", e.getMessage());
+            throw new RuntimeException("회원가입 실패", e);
+        }
     }
+
 
     /**
      *
      * @param request
      * @return
      */
+    @Transactional(readOnly = true)
     public boolean authenticate(UserRegistrationRequest request) {
         User findUser = userRepository.findByUsername(request.getUsername());
         if (findUser != null && passwordEncoder.matches(request.getPassword(), findUser.getPassword())) {
-            logger.info("Authentication successful for user: {}", findUser.getUsername());
-            return true;
+            return true; // 로그인 성공
         } else {
-            logger.info("Authentication failed for user: {}", request.getUsername());
-            return false;
+            return false; // 로그인 실패
         }
     }
+
 }

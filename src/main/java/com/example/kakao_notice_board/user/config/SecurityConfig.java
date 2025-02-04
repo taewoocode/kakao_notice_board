@@ -3,12 +3,15 @@ package com.example.kakao_notice_board.user.config;
 import com.example.kakao_notice_board.user.repository.UserRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 
 @Configuration
@@ -23,36 +26,44 @@ public class SecurityConfig {
 
     private final UserRepository userRepository;
 
-    // 로그인하지 않은 유저들만 접근 가능한 URL
-    private static final String[] anonymousUserUrl = {"/users/login", "/users/join"};
-
-    // 로그인한 유저들만 접근 가능한 URL
-    private static final String[] authenticatedUserUrl = {"/boards/write", "/boards/**/**/edit", "/boards/**/**/delete", "/likes/**", "/users/boards/**", "/users/edit", "/users/delete"};
-
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity, AuthenticationManager authenticationManager) throws Exception {
         httpSecurity
                 .csrf(csrf -> csrf.disable())
-                .cors(cors -> cors.configurationSource(request -> new CorsConfiguration().applyPermitDefaultValues()))
+                .cors(cors -> cors.configurationSource(request -> {
+                    CorsConfiguration config = new CorsConfiguration();
+                    config.addAllowedOriginPattern("*");
+                    config.addAllowedMethod("*");
+                    config.addAllowedHeader("*");
+                    config.setAllowCredentials(true);
+                    return config;
+                }))
                 .authorizeHttpRequests(auth -> {
-                    auth.requestMatchers(anonymousUserUrl).permitAll();
-                    auth.requestMatchers(authenticatedUserUrl).authenticated();
-                    auth.requestMatchers("/users/admin/**").hasAuthority("ADMIN");
+                    auth.requestMatchers("/user/login", "/user/register").permitAll();
+                    auth.requestMatchers("/boards/write", "/boards/*/edit", "/boards/*/delete", "/likes/*", "/user/boards/*", "/user/edit", "/user/delete").authenticated();
+                    auth.requestMatchers("/user/admin/**").hasAuthority("ADMIN");
                     auth.anyRequest().permitAll();
                 })
+                .addFilterBefore(new JsonUsernamePasswordAuthenticationFilter(authenticationManager), UsernamePasswordAuthenticationFilter.class)
                 .formLogin(formLogin -> {
-                    formLogin.loginPage("/users/login")  // 로그인 페이지
-                            .usernameParameter("username")  // 로그인에 사용될 id
-                            .passwordParameter("password")  // 로그인에 사용될 password
-                            .failureUrl("/users/login?fail")  // 로그인 실패 시 redirect될 URL
-                            .successHandler(new LoginSuccessHandler(userRepository));
+                    formLogin.loginPage("/user/login")
+                            .usernameParameter("username")
+                            .passwordParameter("password")
+                            .failureHandler(new LoginFailureHandler())
+                            .successHandler(new LoginSuccessHandler());
                 })
                 .logout(logout -> {
-                    logout.logoutUrl("/users/logout")  // 로그아웃 URL
+                    logout.logoutUrl("/user/logout")
                             .invalidateHttpSession(true)
                             .deleteCookies("JSESSIONID");
                 });
 
         return httpSecurity.build();
+    }
+
+
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
+        return authenticationConfiguration.getAuthenticationManager();
     }
 }
