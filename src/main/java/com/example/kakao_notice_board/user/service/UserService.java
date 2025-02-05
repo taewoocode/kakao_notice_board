@@ -46,11 +46,19 @@ public class UserService {
     @Transactional(readOnly = true)
     public boolean authenticate(UserRegistrationRequest request) {
         User findUser = userRepository.findByUsername(request.getUsername());
-        if (findUser != null && passwordEncoder.matches(request.getPassword(), findUser.getPassword())) {
-            return true; // 로그인 성공
+        if (findUser == null) {
+            // 로그 추가
+            logger.info("사용자 " + request.getUsername() + "를 찾을 수 없습니다.");
+            return false; // 사용자 존재하지 않음
+        }
+
+        boolean passwordMatches = passwordEncoder.matches(request.getPassword(), findUser.getPassword());
+        if (passwordMatches) {
+            return true; // 비밀번호 일치
         } else {
-            return false; // 로그인 실패
+            return false; // 비밀번호 불일치
         }
     }
+
 
 }
