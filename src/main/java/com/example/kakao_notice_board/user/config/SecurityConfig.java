@@ -1,33 +1,32 @@
 package com.example.kakao_notice_board.user.config;
 
-import com.example.kakao_notice_board.user.repository.UserRepository;
+import com.example.kakao_notice_board.user.domain.JwtUtil;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import lombok.RequiredArgsConstructor;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.beans.factory.annotation.Autowired;
 
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    @Bean
-    public BCryptPasswordEncoder encoder() {
-        return new BCryptPasswordEncoder();
-    }
-
-    private final UserRepository userRepository;
+    @Lazy
+    @Autowired
+    private JwtRequestFilter jwtRequestFilter;
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity, AuthenticationManager authenticationManager) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity
                 .csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.configurationSource(request -> {
@@ -44,26 +43,21 @@ public class SecurityConfig {
                     auth.requestMatchers("/user/admin/**").hasAuthority("ADMIN");
                     auth.anyRequest().permitAll();
                 })
-                .addFilterBefore(new JsonUsernamePasswordAuthenticationFilter(authenticationManager), UsernamePasswordAuthenticationFilter.class)
-                .formLogin(formLogin -> {
-                    formLogin.loginPage("/user/login")
-                            .usernameParameter("username")
-                            .passwordParameter("password")
-                            .failureHandler(new LoginFailureHandler())
-                            .successHandler(new LoginSuccessHandler());
-                })
-                .logout(logout -> {
-                    logout.logoutUrl("/user/logout")
-                            .invalidateHttpSession(true)
-                            .deleteCookies("JSESSIONID");
-                });
+                .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class)
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
         return httpSecurity.build();
     }
 
-
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
-        return authenticationConfiguration.getAuthenticationManager();
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
     }
+
+    @Lazy
+    @Bean
+    public JwtRequestFilter jwtRequestFilter(UserDetailsService userDetailsService) {
+        return new JwtRequestFilter(userDetailsService, new JwtUtil());
+    }
+
 }
