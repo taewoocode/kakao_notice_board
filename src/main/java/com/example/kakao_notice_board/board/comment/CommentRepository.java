@@ -1,6 +1,5 @@
-package com.example.kakao_notice_board.board.repository;
+package com.example.kakao_notice_board.board.comment;
 
-import com.example.kakao_notice_board.board.comment.Comment;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

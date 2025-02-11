@@ -1,6 +1,7 @@
 package com.example.kakao_notice_board.board.comment;
 
 import com.example.kakao_notice_board.board.domain.Post;
+import com.example.kakao_notice_board.board.notification.KakaoNotificationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -35,8 +36,7 @@ public class CommentController {
      */
     @PostMapping("/board/{postId}/comments")
     public ResponseEntity<Comment> createComment(@PathVariable Long postId, @RequestBody Comment comment) {
-        comment.setPost(new Post(postId)); // Post 객체를 생성하여 댓글에 설정
-        Comment createdComment = commentService.createComment(comment);
+        Comment createdComment = commentService.createComment(postId, comment);
         return new ResponseEntity<>(createdComment, HttpStatus.CREATED);
     }
 

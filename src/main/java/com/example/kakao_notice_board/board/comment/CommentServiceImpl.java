@@ -1,26 +1,29 @@
 package com.example.kakao_notice_board.board.comment;
 
+import com.example.kakao_notice_board.board.comment.Comment;
+import com.example.kakao_notice_board.board.comment.CommentService;
 import com.example.kakao_notice_board.board.domain.Post;
 import com.example.kakao_notice_board.board.notification.KakaoNotificationService;
-import com.example.kakao_notice_board.board.repository.CommentRepository;
 import com.example.kakao_notice_board.board.repository.PostRepository;
+import com.example.kakao_notice_board.user.domain.User;
+import com.example.kakao_notice_board.user.repository.UserRepository;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class CommentServiceImpl implements CommentService{
+public class CommentServiceImpl implements CommentService {
 
     private final CommentRepository commentRepository;
     private final PostRepository postRepository;
-
-    // Kakao 알림 서비스 추가
+    private final UserRepository userRepository;
     private final KakaoNotificationService kakaoNotificationService;
-
 
     @Override
     public List<Comment> getCommentsByPostId(Long postId) {
@@ -28,16 +31,37 @@ public class CommentServiceImpl implements CommentService{
     }
 
     @Override
-    public Comment createComment(Comment comment) {
+    @Transactional // 트랜잭션 관리
+    public Comment createComment(Long postId, Comment comment) {
+        findBypostToAuthor result = getFindBypostToAuthor(postId, comment);
+        requestSettingPostUser(comment, result.post(), result.author());
         Comment savedComment = commentRepository.save(comment);
-        //게시물 작성자에게 알림 전송
-        Post post = savedComment.getPost();
-        String author = post.getAuthor();
-
-        //알림톡 전송
-        String message = savedComment.getAuthor().getUsername() + "님이 댓글을 남기셨습니다.";
-        kakaoNotificationService.sendNotification(author, message);
+        sendMessageToAuthor(savedComment);
         return savedComment;
+    }
+
+    private findBypostToAuthor getFindBypostToAuthor(Long postId, Comment comment) {
+        // Post 객체 조회 (postId로 찾기)
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new EntityNotFoundException("Post not found"));
+
+        // 댓글 작성자 조회 (comment.getAuthor()에서 userId로 User 객체 찾기)
+        User author = userRepository.findById(comment.getAuthor().getId())
+                .orElseThrow(() -> new EntityNotFoundException("User not found"));
+        return new findBypostToAuthor(post, author);
+    }
+
+    private record findBypostToAuthor(Post post, User author) {}
+
+    private void requestSettingPostUser(Comment comment, Post post, User author) {
+        comment.setPost(post);
+        comment.setAuthor(author);
+    }
+
+    private void sendMessageToAuthor(Comment savedComment) {
+        String message = savedComment.getAuthor().getUsername() + "님이 댓글을 남기셨습니다.";
+        String author = savedComment.getPost().getAuthor();
+        kakaoNotificationService.sendNotification(author, message);
     }
 
     @Override
