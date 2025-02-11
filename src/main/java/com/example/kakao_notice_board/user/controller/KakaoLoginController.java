@@ -1,5 +1,7 @@
 package com.kakaologin.demo.controller;
 
+import com.example.kakao_notice_board.user.dto.KakaoUserInfoResponseDto;
+import com.example.kakao_notice_board.user.service.KakaoService;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kakaologin.demo.dto.KakaoUserInfoResponseDto;
@@ -37,7 +39,6 @@ public class KakaoLoginController {
         String accessToken = kakaoService.getAccessTokenFromKakao(code);
 
         KakaoUserInfoResponseDto userInfo = kakaoService.getUserInfo(accessToken);
-
         // User 로그인, 또는 회원가입 로직 추가
         return new ResponseEntity<>(HttpStatus.OK);
     }
