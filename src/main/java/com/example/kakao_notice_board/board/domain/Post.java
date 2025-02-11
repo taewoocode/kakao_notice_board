@@ -10,6 +10,8 @@ import lombok.Data;
 @Data
 public class Post {
 
+
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -17,4 +19,13 @@ public class Post {
     private String content;
     private String author;
     private String createdAt;
+
+    // Long id를 받는 생성자 추가
+    public Post(Long id) {
+        this.id = id;
+    }
+
+    // 기본 생성자도 필요
+    public Post() {
+    }
 }

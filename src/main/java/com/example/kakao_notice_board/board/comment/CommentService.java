@@ -1,6 +1,4 @@
-package com.example.kakao_notice_board.board.service;
-
-import com.example.kakao_notice_board.board.domain.Comment;
+package com.example.kakao_notice_board.board.comment;
 
 import java.util.List;
 

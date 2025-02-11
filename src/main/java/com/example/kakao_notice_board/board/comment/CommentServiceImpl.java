@@ -1,7 +1,7 @@
-package com.example.kakao_notice_board.board.service;
+package com.example.kakao_notice_board.board.comment;
 
-import com.example.kakao_notice_board.board.domain.Comment;
 import com.example.kakao_notice_board.board.repository.CommentRepository;
+import com.example.kakao_notice_board.board.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -14,6 +14,7 @@ import java.util.List;
 public class CommentServiceImpl implements CommentService{
 
     private final CommentRepository commentRepository;
+    private final PostRepository postRepository;
 
     @Override
     public List<Comment> getCommentsByPostId(Long postId) {
