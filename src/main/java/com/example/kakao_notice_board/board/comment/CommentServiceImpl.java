@@ -3,7 +3,6 @@ package com.example.kakao_notice_board.board.comment;
 import com.example.kakao_notice_board.board.comment.Comment;
 import com.example.kakao_notice_board.board.comment.CommentService;
 import com.example.kakao_notice_board.board.domain.Post;
-import com.example.kakao_notice_board.board.notification.KakaoNotificationService;
 import com.example.kakao_notice_board.board.repository.PostRepository;
 import com.example.kakao_notice_board.user.domain.User;
 import com.example.kakao_notice_board.user.repository.UserRepository;
@@ -23,7 +22,7 @@ public class CommentServiceImpl implements CommentService {
     private final CommentRepository commentRepository;
     private final PostRepository postRepository;
     private final UserRepository userRepository;
-    private final KakaoNotificationService kakaoNotificationService;
+//    private final KakaoNotificationService kakaoNotificationService;
 
     @Override
     public List<Comment> getCommentsByPostId(Long postId) {
@@ -86,7 +85,7 @@ public class CommentServiceImpl implements CommentService {
     private void sendMessageToAuthor(Comment savedComment) {
         String message = savedComment.getAuthor().getUsername() + "님이 댓글을 남기셨습니다.";
         User author = savedComment.getPost().getAuthor();
-        kakaoNotificationService.sendNotification(author, message);
+//        kakaoNotificationService.sendNotification(author, message);
     }
 
     @Override
