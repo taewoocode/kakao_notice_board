@@ -1,7 +1,7 @@
 package com.example.kakao_notice_board.board.controller;
 
 import com.example.kakao_notice_board.board.domain.Post;
-import com.example.kakao_notice_board.board.service.PostService;
+import com.example.kakao_notice_board.board.service.PostServiceImpl;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -16,7 +16,7 @@ import java.util.Optional;
 @RequestMapping("api/posts")
 public class PostController {
 
-    private PostService postService;
+    private PostServiceImpl postService;
 
     /**
      * 게시글 조회

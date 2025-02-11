@@ -39,7 +39,8 @@ public class SecurityConfig {
                 }))
                 .authorizeHttpRequests(auth -> {
                     auth.requestMatchers("/user/login", "/user/register").permitAll();
-                    auth.requestMatchers("/boards/write", "/boards/*/edit", "/boards/*/delete", "/likes/*", "/user/boards/*", "/user/edit", "/user/delete").authenticated();
+                    auth.requestMatchers("/boards/write", "/boards/*/edit",
+                            "/boards/*/delete", "/likes/*", "/user/boards/*", "/user/edit", "/user/delete").authenticated();
                     auth.requestMatchers("/user/admin/**").hasAuthority("ADMIN");
                     auth.anyRequest().permitAll();
                 })
@@ -54,10 +55,14 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
-    @Lazy
-    @Bean
-    public JwtRequestFilter jwtRequestFilter(UserDetailsService userDetailsService) {
-        return new JwtRequestFilter(userDetailsService, new JwtUtil());
-    }
 
+    /**
+     * Filter -> JwtUtil
+     * @param jwtUtil
+     * @return
+     */
+    @Bean @Lazy
+    public JwtRequestFilter jwtRequestFilter(JwtUtil jwtUtil) {
+        return new JwtRequestFilter(jwtUtil);
+    }
 }
