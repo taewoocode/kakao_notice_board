@@ -1,23 +1,26 @@
 package com.example.kakao_notice_board.board.domain;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import com.example.kakao_notice_board.user.domain.User;
+import jakarta.persistence.*;
+
 import lombok.Data;
 
 @Entity
 @Data
 public class Post {
 
-
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     private String title;
     private String content;
-    private String author;
+
+    /** Post User 연결 **/
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "author_id", nullable = false)
+    private User author;
+
     private String createdAt;
 
     // Long id를 받는 생성자 추가

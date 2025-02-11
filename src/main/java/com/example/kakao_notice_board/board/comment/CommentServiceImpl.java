@@ -30,22 +30,43 @@ public class CommentServiceImpl implements CommentService {
         return commentRepository.findByPostId(postId);
     }
 
+    /**
+     *
+     * @param postId
+     * @param comment
+     * @return
+     */
     @Override
     @Transactional // 트랜잭션 관리
     public Comment createComment(Long postId, Comment comment) {
+        // 디버깅 로그 추가
+        log.debug("Creating comment for postId: {}", postId);
+
         findBypostToAuthor result = getFindBypostToAuthor(postId, comment);
+
+        // 디버깅 로그 추가
+        log.debug("Found post: {} and author: {}", result.post().getId(), result.author().getId());
+
         requestSettingPostUser(comment, result.post(), result.author());
         Comment savedComment = commentRepository.save(comment);
+
+        // 디버깅 로그 추가
+        log.debug("Saved comment: {}", savedComment.getId());
+
         sendMessageToAuthor(savedComment);
         return savedComment;
     }
 
     private findBypostToAuthor getFindBypostToAuthor(Long postId, Comment comment) {
-        // Post 객체 조회 (postId로 찾기)
+        // 디버깅 로그 추가
+        log.debug("Fetching post with id: {}", postId);
+
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new EntityNotFoundException("Post not found"));
 
-        // 댓글 작성자 조회 (comment.getAuthor()에서 userId로 User 객체 찾기)
+        // 디버깅 로그 추가
+        log.debug("Fetching author with id: {}", comment.getAuthor().getId());
+
         User author = userRepository.findById(comment.getAuthor().getId())
                 .orElseThrow(() -> new EntityNotFoundException("User not found"));
         return new findBypostToAuthor(post, author);
@@ -58,9 +79,13 @@ public class CommentServiceImpl implements CommentService {
         comment.setAuthor(author);
     }
 
+    /**
+     *
+     * @param savedComment
+     */
     private void sendMessageToAuthor(Comment savedComment) {
         String message = savedComment.getAuthor().getUsername() + "님이 댓글을 남기셨습니다.";
-        String author = savedComment.getPost().getAuthor();
+        User author = savedComment.getPost().getAuthor();
         kakaoNotificationService.sendNotification(author, message);
     }
 
