@@ -23,6 +23,10 @@ public class User {
     @Column(nullable = false, unique = true)
     private String email;
 
+    @Column(nullable = true)
+    private String kakaoId;  // 카카오톡 ID 추가
+
+
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id")) // 역할 테이블 명시
     @Enumerated(EnumType.STRING)
