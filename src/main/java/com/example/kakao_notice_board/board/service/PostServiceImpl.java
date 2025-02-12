@@ -2,6 +2,8 @@ package com.example.kakao_notice_board.board.service;
 
 import com.example.kakao_notice_board.board.domain.Post;
 import com.example.kakao_notice_board.board.repository.PostRepository;
+import com.example.kakao_notice_board.trace.TraceStatus;
+import com.example.kakao_notice_board.trace.hellotrace.HelloTraceV1;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -13,13 +15,23 @@ import java.util.Optional;
 public class PostServiceImpl implements PostService {
 
     private PostRepository postRepository;
+    private final HelloTraceV1 trace;
 
     /**
      * 게시글 조회
      * @return
      */
     public List<Post> getAllPosts() {
-        return postRepository.findAll();
+        TraceStatus status = null;
+        try {
+            status = trace.begin("PostService.getAllPosts()");
+            List<Post> posts = postRepository.findAll();
+            trace.end(status);
+            return posts;
+        } catch (Exception e) {
+            trace.exception(status, e);
+            throw e;
+        }
     }
 
     /**
