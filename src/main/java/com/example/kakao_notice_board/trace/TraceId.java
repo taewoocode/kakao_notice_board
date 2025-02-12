@@ -12,12 +12,15 @@ public class TraceId {
         this.level = 0;
     }
 
+    public TraceId() {
+    }
+
     /**
      * createId
      * @return
      */
     private String createId() {
-        return UUID.randomUUID().toString().substring(08);
+        return UUID.randomUUID().toString().substring(8);
     }
 
     /**
