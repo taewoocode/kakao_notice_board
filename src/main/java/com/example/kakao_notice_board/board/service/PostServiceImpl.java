@@ -59,4 +59,12 @@ public class PostServiceImpl implements PostService {
     public void deletePost(Long id) {
         postRepository.deleteById(id);
     }
+
+    /**
+     *
+     * @return
+     */
+    public List<Post> getCustomPosts() {
+        return postRepository.findCustomPosts();
+    }
 }

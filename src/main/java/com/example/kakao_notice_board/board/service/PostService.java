@@ -1,6 +1,7 @@
 package com.example.kakao_notice_board.board.service;
 
 import com.example.kakao_notice_board.board.domain.Post;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -8,6 +9,7 @@ import java.util.Optional;
 public interface PostService {
 
 
+    @Transactional
     List<Post> getAllPosts();
 
     /**
@@ -29,4 +31,6 @@ public interface PostService {
      * @param id
      */
     void deletePost(Long id);
+
+    List<Post> getCustomPosts();
 }

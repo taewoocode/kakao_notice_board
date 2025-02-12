@@ -14,12 +14,11 @@ import java.util.List;
 @Repository
 public class PostRepositoryImpl implements PostRepositoryCustom{
 
-    private final PostRepository postRepository;
+    private final EntityManager entityManager;
     private final HelloTraceV1 trace;
 
-    @Autowired
-    public PostRepositoryImpl(PostRepository postRepository, HelloTraceV1 trace) {
-        this.postRepository = postRepository;
+    public PostRepositoryImpl(EntityManager entityManager, HelloTraceV1 trace) {
+        this.entityManager = entityManager;
         this.trace = trace;
     }
 
@@ -32,7 +31,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom{
         TraceStatus status = null;
         try {
             status = trace.begin("PostRepository.findCustomPosts");
-            List<Post> posts = postRepository.findAll();
+            List<Post> posts = (List<Post>) entityManager.createQuery("SELECT p FROM Post p", Post.class);
             trace.end(status);
             return posts;
         } catch (Exception e) {

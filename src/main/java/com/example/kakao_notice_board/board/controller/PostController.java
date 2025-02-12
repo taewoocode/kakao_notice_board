@@ -28,11 +28,11 @@ public class PostController {
      *
      * @return
      */
-    @GetMapping
+    @GetMapping("/all")
     public ResponseEntity<List<Post>> getAllPosts() {
         TraceStatus status = null;
         try {
-            status = trace.begin("PostController.getAllPosts()");
+            status = trace.begin("PostController.getCustomPosts()");
             List<Post> posts = postService.getAllPosts();
             return ResponseEntity.ok(posts);
 

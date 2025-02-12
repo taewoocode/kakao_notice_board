@@ -1,8 +1,8 @@
 package com.example.kakao_notice_board.board.domain;
 
 import com.example.kakao_notice_board.user.domain.User;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
-
 import lombok.Data;
 
 @Entity
@@ -17,9 +17,10 @@ public class Post {
     private String content;
 
     /** Post User 연결 **/
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "author_id", nullable = false)
     private User author;
+
 
     private String createdAt;
 
@@ -28,7 +29,6 @@ public class Post {
         this.id = id;
     }
 
-    // 기본 생성자도 필요
     public Post() {
     }
 }
