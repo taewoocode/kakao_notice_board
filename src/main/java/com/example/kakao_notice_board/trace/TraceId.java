@@ -27,7 +27,7 @@ public class TraceId {
      * createNextTaceId
      * @return
      */
-    public TraceId nextTraceId() {
+    public TraceId createNextId() {
         return new TraceId(id, level + 1);
     }
 
