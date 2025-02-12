@@ -3,6 +3,8 @@ package com.example.kakao_notice_board.board.controller;
 import com.example.kakao_notice_board.board.domain.Post;
 import com.example.kakao_notice_board.board.service.PostService;
 import com.example.kakao_notice_board.board.service.PostServiceImpl;
+import com.example.kakao_notice_board.trace.TraceStatus;
+import com.example.kakao_notice_board.trace.hellotrace.HelloTraceV1;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -19,6 +21,7 @@ import java.util.Optional;
 public class PostController {
 
     private final PostService postService;
+    private final HelloTraceV1 trace;
 
     /**
      * 게시글 조회
@@ -27,8 +30,16 @@ public class PostController {
      */
     @GetMapping
     public ResponseEntity<List<Post>> getAllPosts() {
-        List<Post> posts = postService.getAllPosts();
-        return ResponseEntity.ok(posts);
+        TraceStatus status = null;
+        try {
+            status = trace.begin("PostController.getAllPosts()");
+            List<Post> posts = postService.getAllPosts();
+            return ResponseEntity.ok(posts);
+
+        } catch (Exception e) {
+            trace.exception(status, e);
+            throw e;
+        }
     }
 
     /**
