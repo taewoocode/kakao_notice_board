@@ -1,8 +1,43 @@
 package com.example.kakao_notice_board.board.repository;
 
+import com.example.kakao_notice_board.board.domain.Post;
+import com.example.kakao_notice_board.trace.TraceStatus;
+import com.example.kakao_notice_board.trace.hellotrace.HelloTraceV1;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.orm.jpa.EntityManagerHolder;
 import org.springframework.stereotype.Repository;
 
-@Repository
-public class PostRepositoryImpl implements PostRepository{
+import java.util.List;
 
+@Repository
+public class PostRepositoryImpl implements PostRepositoryCustom{
+
+    private final PostRepository postRepository;
+    private final HelloTraceV1 trace;
+
+    @Autowired
+    public PostRepositoryImpl(PostRepository postRepository, HelloTraceV1 trace) {
+        this.postRepository = postRepository;
+        this.trace = trace;
+    }
+
+    /**
+     *
+     * @return
+     */
+    @Override
+    public List<Post> findCustomPosts() {
+        TraceStatus status = null;
+        try {
+            status = trace.begin("PostRepository.findCustomPosts");
+            List<Post> posts = postRepository.findAll();
+            trace.end(status);
+            return posts;
+        } catch (Exception e) {
+            trace.exception(status, e);
+            throw e;
+        }
+    }
 }
